@@ -2,13 +2,13 @@ import javax.swing.*;
 
 public class JUtil {
 
-    public static String stringIn()
+    public static String stringIn(String dialog)
     {
         boolean flag = false;
         String data = "";
 
         while (!flag) {
-            data = JOptionPane.showInputDialog("Dame una palabra.");
+            data = JOptionPane.showInputDialog(null,String.format("%s", dialog),"",JOptionPane.PLAIN_MESSAGE);
             if (!data.isEmpty())
                 flag = true;
         }
@@ -23,8 +23,8 @@ public class JUtil {
         return  o;
     }
 
-    public static void message(String data)
+    public static void message(String dialog)
     {
-
+        JOptionPane.showMessageDialog(null,dialog,"",JOptionPane.INFORMATION_MESSAGE,null);
     }
 }
