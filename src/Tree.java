@@ -1,31 +1,79 @@
-import java.util.ArrayList;
+import java.util.HashMap;
+import java.util.Map;
+import java.util.Scanner;
 
-public class Tree
-{
-    ArrayList<Node> father;
+class Tree {
+    private final NaryNode root;
 
-
-    protected void initialize(String s)
-    {
-        father = new ArrayList<>(); father.add(Node.newNode(null,s.charAt(0)));
-        for (int i = 1; i < s.length(); i++)
-            father.childrens.add(new Node(s.charAt(i)));
-
+    public Tree() {
+        this.root = new NaryNode(""); // Root node represents the starting point of the tree
     }
 
-    protected void add(String s)
-    {
-        father.childrens.add(new Node(s));
+    public void insert(String word) {
+        NaryNode current = root;
+        for (char letter : word.toCharArray()) {
+            String key = String.valueOf(letter);
+            current.children.putIfAbsent(key, new NaryNode(key));
+            current = current.children.get(key);
+        }
+        current.isEndOfWord = true; // Mark the end of the word
     }
-    
-    protected void print()
-    {
-        StringBuilder tree = new StringBuilder();
-        Node aux = father;
-        while (true)
-        {
-            tree = new StringBuilder(String.format("%s %s", tree, aux.value));
+
+    public boolean search(String word) {
+        NaryNode current = root;
+        for (char letter : word.toCharArray()) {
+            String key = String.valueOf(letter);
+            if (!current.children.containsKey(key)) {
+                return false;
+            }
+            current = current.children.get(key);
+        }
+        return current.isEndOfWord;
+    }
+
+    public boolean delete(String word) {
+        return deleteRecursive(root, word, 0);
+    }
+
+    private boolean deleteRecursive(NaryNode node, String word, int depth) {
+        if (depth == word.length()) {
+            if (!node.isEndOfWord) {
+                System.out.println("Word does not exist in the tree.");
+                return false;
+            }
+            node.isEndOfWord = false;
+            return node.children.isEmpty();
+        }
+
+        String letter = String.valueOf(word.charAt(depth));
+        if (!node.children.containsKey(letter)) {
+            return false;
+        }
+
+        boolean shouldDeleteChild = deleteRecursive(node.children.get(letter), word, depth + 1);
+
+        if (shouldDeleteChild) {
+            node.children.remove(letter);
+            return node.children.isEmpty() && !node.isEndOfWord;
+        }
+        return false;
+    }
+
+    public void printTree() {
+        if (root.children.isEmpty()) {
+            System.out.println("The tree is empty.");
+            return;
+        }
+        printRecursive(root, 0);
+    }
+
+    private void printRecursive(NaryNode node, int level) {
+        String prefix = node.isEndOfWord ? "*-> " : "-> ";
+        if (!node.value.isEmpty()) { // Skip printing the root value (empty string)
+            System.out.println("    ".repeat(level) + prefix + node.value);
+        }
+        for (NaryNode child : node.children.values()) {
+            printRecursive(child, level + 1);
         }
     }
 }
-
